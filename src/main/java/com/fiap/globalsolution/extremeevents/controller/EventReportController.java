@@ -52,7 +52,6 @@ public class EventReportController {
             existingReport.setLocation(eventReportDetails.getLocation());
             existingReport.setSeverity(eventReportDetails.getSeverity());
             existingReport.setDescription(eventReportDetails.getDescription());
-            // Keep original timestamp or update? Let's keep original for now.
             // existingReport.setTimestamp(LocalDateTime.now());
             EventReport updatedReport = eventReportRepository.save(existingReport);
             return ResponseEntity.ok(updatedReport);
