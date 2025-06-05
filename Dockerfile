@@ -1,50 +1,48 @@
-# Stage 1: Build the application using Gradle
+# Estágio 1: Compilar a aplicação usando Gradle
 FROM gradle:8.8.0-jdk21 AS build
 
-# Set the working directory inside the container
+# Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-# Copy the Gradle build files AND the wrapper script
+# Copia os arquivos de build do Gradle E o script do wrapper
 COPY build.gradle settings.gradle gradlew /app/
 COPY gradle /app/gradle
 
-# Copy the source code
+# Copia o código fonte
 COPY src /app/src
 
-# Grant execution permissions to gradlew
+# Concede permissões de execução ao gradlew
 RUN chmod +x ./gradlew
 
-# Build the application JAR file
-# Use --no-daemon to avoid issues in some CI/CD environments
+# Compila o arquivo JAR da aplicação
+# Use --no-daemon para evitar problemas em alguns ambientes de CI/CD
 RUN ./gradlew build --no-daemon -x test
 
-# Stage 2: Create the final lightweight image
+# Estágio 2: Criar a imagem final leve
 FROM eclipse-temurin:21-jre-jammy
 
-# Create a non-root user and group
+# Cria um usuário e grupo não-root
 RUN groupadd --gid 1001 appgroup && \
     useradd --uid 1001 --gid appgroup --create-home --shell /bin/bash appuser
 
-# Set the working directory
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copy the JAR file from the build stage
+# Copia o arquivo JAR do estágio de compilação
 COPY --from=build /app/build/libs/*.jar app.jar
 
-# Set environment variable for the database URL (example, can be overridden)
-# This fulfills the requirement of having at least one ENV variable
+# Define a variável de ambiente para a URL do banco de dados (exemplo, pode ser sobrescrita)
 ENV DB_URL=jdbc:postgresql://postgres-db:5432/extreme_events_db
 
-# Expose the application port (default 8080, can be overridden by SERVER_PORT env var)
+# Expõe a porta da aplicação (padrão 8080, pode ser sobrescrita pela variável de ambiente SERVER_PORT)
 EXPOSE 8080
 
-# Change ownership of the app directory and JAR file to the non-root user
-# Ensure the user exists before changing ownership
+# Altera a propriedade do diretório da aplicação e do arquivo JAR para o usuário não-root
+# Garante que o usuário exista antes de alterar a propriedade
 RUN chown -R appuser:appgroup /app
 
-# Switch to the non-root user
+# Alterna para o usuário não-root
 USER appuser
 
-# Define the entry point for running the application
+# Define o ponto de entrada para executar a aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
