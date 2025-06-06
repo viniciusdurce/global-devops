@@ -272,7 +272,7 @@ Agora, tente consultar novamente os eventos que você criou no passo 2:
 
 Você também pode testar isso via API tester, faça um GET novamente e veja se os dados ainda estão lá! 🎉
 
-## ▶️ Link do vídeo explicativo: 
+## ▶️ Link do vídeo explicativo: https://youtu.be/L09guWgl2Fg?si=k6RiiR4MrXiF07RN
 
 ## 🤝 Grupo
 
